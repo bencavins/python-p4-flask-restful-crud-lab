@@ -17,13 +17,12 @@ db.init_app(app)
 api = Api(app)
 
 
-class Plants(Resource):
-
-    def get(self):
+@app.route('/plants', methods=['GET', 'POST'])
+def all_plants():
+    if request.method == 'GET':
         plants = [plant.to_dict() for plant in Plant.query.all()]
         return make_response(jsonify(plants), 200)
-
-    def post(self):
+    elif request.method == 'POST':
         data = request.get_json()
 
         new_plant = Plant(
@@ -38,17 +37,11 @@ class Plants(Resource):
         return make_response(new_plant.to_dict(), 201)
 
 
-api.add_resource(Plants, '/plants')
-
-
-class PlantByID(Resource):
-
-    def get(self, id):
+@app.route('/plants/<int:id>', methods=['GET'])
+def plant_by_id(id):
+    if request.method == 'GET':
         plant = Plant.query.filter_by(id=id).first().to_dict()
         return make_response(jsonify(plant), 200)
-
-
-api.add_resource(PlantByID, '/plants/<int:id>')
 
 
 if __name__ == '__main__':
